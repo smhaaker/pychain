@@ -1,7 +1,9 @@
 import functools
 import hashlib
-import json
 from collections import OrderedDict
+
+# internal imports
+from hash_util import hash_string_256, hash_block
 
 # define chain
 MINING_REWARD = 10 # global constant 
@@ -18,17 +20,6 @@ owner = 'Owner'
 participants = {'Owner'}
 
 
-def hash_block(block):
-    """ returns hash block
-    
-    Arguments: 
-        :block: The Block That Will Be Hashed
-    """
-    return hashlib.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
-#    return '-'.join([str(block[key]) for key in block])
-    # use sort_keys to true to sort keys before hashing
-
-
 def valid_proof(transactions, last_hash, proof):
     """ Checks if new hash is valid
 
@@ -38,10 +29,11 @@ def valid_proof(transactions, last_hash, proof):
         :proof: proof number / nonce
     """
     guess = (str(transactions) + str(last_hash) + str(proof)).encode() # concat a string
-    guess_hash = hashlib.sha256(guess).hexdigest() # guessing if our guess is same as hash
+    guess_hash = hash_string_256(guess) # guessing if our guess is same as hash
     print(guess_hash)
     return guess_hash[0:2] == '00' # checking the leading zeros, if it is really a hash difficulty change
     # just add zeros to increase difficulty 
+
 
 def proof_of_work():
     last_block = blockchain[-1]
