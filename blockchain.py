@@ -9,58 +9,66 @@ from hash_util import hash_string_256, hash_block
 
 # define chain
 MINING_REWARD = 10 # global constant 
-
-# genesis block
-genesis_block = {
-        'previous_hash': '',
-        'index': 0,
-        'transactions': [],
-        'proof': 100
-}
-blockchain = [genesis_block] # list
-open_transactions = [] # list of pending transactions
+blockchain = []
 owner = 'Owner'
 participants = {'Owner'}
 
 
 def load_data():
     """Load data"""
-    with open('blockchain.txt', mode='r')as f:
-        file_content = f.readlines()
-        global blockchain
-        global open_transactions
-        blockchain = json.loads(file_content[0][:-1]) #deserializes the string with range selector
-        updated_blockchain = []
-        for block in blockchain:
-            updated_block = {
-                'previous_hash': block['previous_hash'],
-                'index': block['index'],
-                'proof': block['proof'],
-                'transactions': [OrderedDict(
-                    [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) for tx in block['transactions']] 
-            }
-            updated_blockchain.append(updated_block)
-        blockchain = updated_blockchain
-        # to remove linebreak
-        open_transactions = json.loads(file_content[1])
-        updated_transactions = []
-        for tx in open_transactions:
-            updated_transaction = OrderedDict(
-                    [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) 
-            updated_transactions.append(updated_transaction)
-        open_transactions = updated_transactions
+    global blockchain
+    global open_transactions
+    try:
+        with open('blockchain.txt', mode='r')as f:
+            file_content = f.readlines()
+            blockchain = json.loads(file_content[0][:-1]) #deserializes the string with range selector
+            updated_blockchain = []
+            for block in blockchain:
+                updated_block = {
+                    'previous_hash': block['previous_hash'],
+                    'index': block['index'],
+                    'proof': block['proof'],
+                    'transactions': [OrderedDict(
+                        [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) for tx in block['transactions']] 
+                }
+                updated_blockchain.append(updated_block)
+            blockchain = updated_blockchain
+            # to remove linebreak
+            open_transactions = json.loads(file_content[1])
+            updated_transactions = []
+            for tx in open_transactions:
+                updated_transaction = OrderedDict(
+                        [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) 
+                updated_transactions.append(updated_transaction)
+            open_transactions = updated_transactions
+    except IOError:
+        # genesis block
+        genesis_block = {
+                'previous_hash': '',
+                'index': 0,
+                'transactions': [],
+                'proof': 100
+        }
+        blockchain = [genesis_block] # list
+        open_transactions = [] # list of pending transactions
+    finally:
+        print('cleanup!')
 
 load_data()
 
 
 def save_data():
     """Saves data to file"""
-    with open('blockchain.txt', mode='w')as f:
-        f.write(json.dumps(blockchain))
-        f.write('\n')
-        f.write(json.dumps(open_transactions))
-#        f.write(pickle.dumps(blockchain)) # set mode to wb for binary 
-# if we want to use pickle
+    try:
+        with open('blockchain.txt', mode='w')as f:
+            f.write(json.dumps(blockchain))
+            f.write('\n')
+            f.write(json.dumps(open_transactions))
+    #        f.write(pickle.dumps(blockchain)) # set mode to wb for binary 
+    # if we want to use pickle
+    except IOError:
+        print('save failed')
+
 
 def valid_proof(transactions, last_hash, proof):
     """ Checks if new hash is valid
