@@ -18,14 +18,23 @@ class Blockchain:
         genesis_block = Block(0, '', [], 100, 0)
 
         # empty list
-        self.__chain = [genesis_block] #private
+        self.chain = [genesis_block] #private
         self.__open_transactions = [] #private
         self.load_data()
         self.hosting_node = hosting_node_id
 
+    @property
+    def chain(self):
+        return self.__chain[:]    
 
-    def get_chain(self):
-        return self.__chain[:]
+
+    @chain.setter
+    def chain(self,val):
+        self.__chain = val
+
+
+    # def get_chain(self):
+    #     return self.__chain[:]
 
 
     def get_open_transactions(self):
@@ -51,7 +60,7 @@ class Blockchain:
                     #         [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) for tx in block['transactions']] 
                     # }
                     updated_blockchain.append(updated_block)
-                self.__chain = updated_blockchain
+                self.chain = updated_blockchain
                 # to remove linebreak
                 open_transactions = json.loads(file_content[1])
                 updated_transactions = []
