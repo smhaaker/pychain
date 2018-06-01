@@ -12,6 +12,9 @@ def hash_block(block):
     Arguments: 
         :block: The Block That Will Be Hashed
     """
-    return hash_string_256(json.dumps(block, sort_keys=True).encode())
-#    return '-'.join([str(block[key]) for key in block])
+    hashable_block = block.__dict__.copy()
+    hashable_block['transactions'] = [tx.to_ordered_dict() for tx in hashable_block['transactions']] # ordered dict
+    return hash_string_256(json.dumps(hashable_block, sort_keys=True).encode())
+    # return hash_string_256(json.dumps(block, sort_keys=True).encode())
+    # return '-'.join([str(block[key]) for key in block])
     # use sort_keys to true to sort keys before hashing
