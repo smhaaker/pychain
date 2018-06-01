@@ -23,7 +23,7 @@ class Node:
 
     def print_blockchain_elements(self):
         # output blockchain list / for loop
-        for block in self.blockchain.chain:
+        for block in self.blockchain.get_chain():
             print('Block')
             print(block)
         else:
@@ -52,7 +52,7 @@ class Node:
                     print('Added transaction successful')
                 else:
                     print('transaction failed')
-                print('Open Transactions: ' + str(self.blockchain.open_transactions))
+                print('Open Transactions: ' + str(self.blockchain.get_open_transactions()))
             elif user_choice == '2':
                 self.blockchain.mine_block()
             elif user_choice == '3':
@@ -61,8 +61,7 @@ class Node:
             # elif user_choice == '4':
             #    print(participants)
             elif user_choice == '4':
-                verifier = Verification()
-                if verifier.verify_transactions(self.blockchain.open_transactions, self.blockchain.get_balance):
+                if Verification.verify_transactions(self.blockchain.get_open_transactions(), self.blockchain.get_balance):
                     print('All transactions valid')
                 else:
                     print('some invalid transactions')
@@ -81,8 +80,7 @@ class Node:
                 # continue skips rest of the loop code. but does not exit the loop
             else: 
                 print('invalid input')
-            verifier = Verification()
-            if not verifier.verify_chain(self.blockchain.chain):
+            if not Verification.verify_chain(self.blockchain.get_chain()):
                 self.print_blockchain_elements()
                 print('invalid chain')
                 break
