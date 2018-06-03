@@ -1,14 +1,22 @@
 from uuid import uuid4 # improt unique id
 
 from blockchain import Blockchain
-from verification import Verification
+#from verification import Verification
+from util.verification import Verification
+from wallet import Wallet
+
 
 class Node:
 
     def __init__(self):
-#        self.id = str(uuid4())
-        self.id = 'STEFFEN'
-        self.blockchain = Blockchain(self.id) #generates new chain with unique node id
+#        self.wallet.public_key = str(uuid4())
+        self.wallet = Wallet()
+
+#        self.wallet.public_key = 'STEFFEN' # remove when wallet works
+#        self.blockchain = Blockchain(self.wallet.public_key) #generates new chain with unique node id
+        self.wallet.create_keys()
+        self.blockchain = Blockchain(self.wallet.public_key)
+
 
     def get_transaction_value(self):
         tx_recipient = input('enter the recipient:') 
@@ -29,7 +37,9 @@ class Node:
         else:
             print('-' * 30)
 
+
     def listen_for_input(self):
+        # split this while loop up in other function. 
         waiting_for_input = True
                 # validate letters as well. 
         while waiting_for_input:
@@ -37,24 +47,27 @@ class Node:
             print('1: add transaction')
             print('2: mine new block')
             print('3: output blockchain')
-            print('4: show participants')
-            print('5: Check transaction validity')
+            print('4: Check transaction validity')
+            print('5: Create Wallet')
+            print('6: Load Wallet')
+            print('7: Save Keys')
             print('h: Manipulate Chain')
             print('0: quit')
             user_choice = self.get_user_choice()
             print(user_choice)
             if user_choice == '1':
-                print('you picked 1')
                 tx_data = self.get_transaction_value()
                 recipient, amount = tx_data
                 # just add a if to check if success as under
-                if self.blockchain.add_transaction(recipient, self.id, amount=amount):
+                signature = self.wallet.sign_transaction(self.wallet.public_key, recipient, amount)
+                if self.blockchain.add_transaction(recipient, self.wallet.public_key, signature, amount=amount):
                     print('Added transaction successful')
                 else:
                     print('transaction failed')
                 print('Open Transactions: ' + str(self.blockchain.get_open_transactions()))
             elif user_choice == '2':
-                self.blockchain.mine_block()
+                if not self.blockchain.mine_block(): # if this does not succes print statement
+                    print('Mining Failed. Create a wallet')
             elif user_choice == '3':
                 print('you picked 3')
                 self.print_blockchain_elements()
@@ -73,6 +86,15 @@ class Node:
             #             'transactions': [{'sender': 'Marco', 'recipient': 'polo', 'amount': 1000}]
             #         }
             #         print('picked h')
+            elif user_choice == '5': # create wallet
+            #   self.wallet = Wallet()
+                self.wallet.create_keys()
+                self.blockchain = Blockchain(self.wallet.public_key)
+            elif user_choice == '6': # load wallet
+                self.wallet.load_keys()
+                self.blockchain = Blockchain(self.wallet.public_key)
+            elif user_choice == '7': # load wallet
+                self.wallet.save_keys()
             elif user_choice == '0':
                 # break
                 waiting_for_input = False 
@@ -84,9 +106,9 @@ class Node:
                 self.print_blockchain_elements()
                 print('invalid chain')
                 break
-            print('Balance of {0}: {1:6.2f}'.format(self.id, self.blockchain.get_balance()))
+            print('Balance of {0}: {1:6.2f}'.format(self.wallet.public_key, self.blockchain.get_balance()))
             #Better formatting by string formatting
         print('Closed!')
-
-node = Node()
-node.listen_for_input()
+if __name__ == '__main__':
+    node = Node()
+    node.listen_for_input()

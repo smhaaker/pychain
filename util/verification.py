@@ -1,4 +1,8 @@
-from hash_util import hash_string_256, hash_block
+""" Provides Helper Methods """
+
+from util.hash_util import hash_block, hash_string_256
+from wallet import Wallet
+
 
 class Verification:
     @staticmethod # decorators
@@ -29,22 +33,28 @@ class Verification:
                 return False
         return True
 
+
     # verifying transactions.
     @staticmethod
-    def verify_transaction(transaction, get_balance):
-        sender_balance = get_balance()
-        if sender_balance >= transaction.amount:
-            return True
-        else: 
-            return False
+    def verify_transaction(transaction, get_balance, check_funds=True):
+        if check_funds:
+            sender_balance = get_balance()
+            return sender_balance >= transaction.amount and Wallet.verify_transaction(transaction)
+        else:
+            return Wallet.verify_transaction(transaction)
+        # if sender_balance >= transaction.amount:
+        #     return True
+        # else: 
+        #     return False
 
         # can also write as return sender_balance => transaction['amount]
         # since it just returns true or false. 
 
 
+
     @classmethod
     def verify_transactions(cls, open_transactions, get_balance):
-        return all([cls.verify_transaction(tx, get_balance) for tx in open_transactions])
+        return all([cls.verify_transaction(tx, get_balance, False) for tx in open_transactions])
 
         # the above is a list comprehension of whats below
         # using all, checks if all transactions are true. Any would check if at least one is true

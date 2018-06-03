@@ -5,10 +5,13 @@ import json
 import pickle #stores in binary and serializes it if wanted
 
 # internal imports
+from util.hash_util import hash_block, hash_string_256
+from util.verification import Verification
 from block import Block
 from transaction import Transaction
-from verification import Verification
-from hash_util import hash_string_256, hash_block
+from wallet import Wallet
+#from verification import Verification
+#from hash_util import hash_string_256, hash_block
 
 MINING_REWARD = 10 # global constant 
 
@@ -48,7 +51,7 @@ class Blockchain:
                 blockchain = json.loads(file_content[0][:-1]) #deserializes the string with range selector
                 updated_blockchain = []
                 for block in blockchain:
-                    converted_tx = [Transaction(tx['sender'], tx['recipient'], tx['amount']) for tx in block['transactions']]
+                    converted_tx = [Transaction(tx['sender'], tx['recipient'], tx['signature'], tx['amount']) for tx in block['transactions']]
                     # converted_tx = [OrderedDict(
                     #         [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) for tx in block['transactions']] 
                     updated_block = Block(block['index'], block['previous_hash'], converted_tx, block['proof'], block['timestamp'])
@@ -65,7 +68,7 @@ class Blockchain:
                 open_transactions = json.loads(file_content[1])
                 updated_transactions = []
                 for tx in open_transactions:
-                    updated_transaction = Transaction(tx['sender'], tx['recipient'], tx['amount'])
+                    updated_transaction = Transaction(tx['sender'], tx['recipient'], tx['signature'], tx['amount'])
                     # updated_transaction = OrderedDict(
                     #         [('sender', tx['sender']), ('recipient', tx['recipient']), ('amount', tx['amount'])]) 
                     updated_transactions.append(updated_transaction)
@@ -131,7 +134,7 @@ class Blockchain:
 
 
     # value function
-    def add_transaction(self, recipient, sender, amount=1.0):
+    def add_transaction(self, recipient, sender, signature, amount=1.0):
         """ Adds a transaction to the chain 
         
         Arguments:
@@ -144,9 +147,12 @@ class Blockchain:
         #     'recipient': recipient, 
         #     'amount': amount} # dictionary key value pair sender is key
 
+        # check if we have wallet or not, If not we cant add transaction
+        if self.hosting_node == None:
+            return False
         # using a ordered dictionary instead
         # our key value pair becomes tuples instead
-        transaction = Transaction(sender, recipient, amount)
+        transaction = Transaction(sender, recipient, signature, amount)
         # transaction = OrderedDict([('sender', sender), ('recipient', recipient), ('amount', amount)])
         if Verification.verify_transaction(transaction, self.get_balance): # if verify transaction successds then do following
             self.__open_transactions.append(transaction) # storing above transactions 
@@ -161,6 +167,10 @@ class Blockchain:
     def mine_block(self):
         """ Mines a new block
         """
+        # make sure we cant mine without valid wallet
+        if self.hosting_node == None:
+            return False
+
         last_block = self.__chain[-1] # shows current last block of blockchain 
         hashed_block = hash_block(last_block)
         proof = self.proof_of_work()
@@ -170,15 +180,19 @@ class Blockchain:
         #     'amount': MINING_REWARD
         # }
         # using ordered dictionary instead
-        reward_transaction = Transaction('MINING', self.hosting_node, MINING_REWARD)
+        reward_transaction = Transaction('MINING', self.hosting_node, '' ,MINING_REWARD)
         # reward_transaction = OrderedDict([('sender', 'MINING'), ('recipient', owner), ('amount', MINING_REWARD)])
         copied_transactions = self.__open_transactions[:]
+        for tx in copied_transactions:
+            if not Wallet.verify_transaction(tx):
+                return False
         copied_transactions.append(reward_transaction)
         # for key in last_block: # for loop on dictionary only loops over keys
         #     value = last_block[key]
         #     hashed_block = hashed_block + str(value)
         #print(hashed_block)
         block = Block(len(self.__chain), hashed_block, copied_transactions, proof)
+
         # block = {
         #     'previous_hash': hashed_block,
         #     'index': len(blockchain),
