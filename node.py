@@ -48,7 +48,7 @@ class Node:
                 tx_data = self.get_transaction_value()
                 recipient, amount = tx_data
                 # just add a if to check if success as under
-                if self.blockchain.add_transaction(recipient,self.id, amount=amount):
+                if self.blockchain.add_transaction(recipient, self.id, amount=amount):
                     print('Added transaction successful')
                 else:
                     print('transaction failed')
