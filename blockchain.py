@@ -169,8 +169,8 @@ class Blockchain:
         """
         # make sure we cant mine without valid wallet
         if self.hosting_node == None:
-            return False
-
+            # return False For Old Node.py
+            return None
         last_block = self.__chain[-1] # shows current last block of blockchain 
         hashed_block = hash_block(last_block)
         proof = self.proof_of_work()
@@ -185,7 +185,8 @@ class Blockchain:
         copied_transactions = self.__open_transactions[:]
         for tx in copied_transactions:
             if not Wallet.verify_transaction(tx):
-                return False
+                return None
+                # return False For Old Node.py
         copied_transactions.append(reward_transaction)
         # for key in last_block: # for loop on dictionary only loops over keys
         #     value = last_block[key]
@@ -202,6 +203,7 @@ class Blockchain:
         self.__chain.append(block)
         self.__open_transactions = []
         self.save_data()
-        return True # sets open_transactions to blank
+        return Block
+        # return True # sets open_transactions to blank For Old Node.py
 
 
