@@ -43,9 +43,11 @@ class Wallet:
                     f.write(self.public_key)
                     f.write('\n')
                     f.write(self.private_key)
+                return True
             except (IOError, IndexError):
                 print('Wallet creation failed')        
-        
+                return False
+                
 
     def generate_keys(self):
         private_key = RSA.generate(1024, Crypto.Random.new().read)

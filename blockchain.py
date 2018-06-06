@@ -15,6 +15,8 @@ from wallet import Wallet
 
 MINING_REWARD = 10 # global constant 
 
+print(__name__)
+
 class Blockchain:
     def __init__(self, hosting_node_id):
         # genesis block
@@ -26,6 +28,7 @@ class Blockchain:
         self.load_data()
         self.hosting_node = hosting_node_id
 
+
     @property
     def chain(self):
         return self.__chain[:]    
@@ -36,12 +39,15 @@ class Blockchain:
         self.__chain = val
 
 
+
+
     # def get_chain(self):
     #     return self.__chain[:]
 
 
     def get_open_transactions(self):
         return self.__open_transactions[:]
+
 
     def load_data(self):
         """Load data"""
@@ -164,6 +170,8 @@ class Blockchain:
         return False
 
 
+
+
     def mine_block(self):
         """ Mines a new block
         """
@@ -203,7 +211,5 @@ class Blockchain:
         self.__chain.append(block)
         self.__open_transactions = []
         self.save_data()
-        return Block
-        # return True # sets open_transactions to blank For Old Node.py
-
+        return block
 

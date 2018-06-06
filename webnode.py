@@ -9,6 +9,27 @@ wallet = Wallet()
 blockchain = Blockchain(wallet.public_key)
 CORS(app) #wrap app with CORS to allow access 
 
+@app.route('/wallet', methods=['POST'])
+def create_keys():
+    wallet.create_keys()
+    if wallet.save_keys():
+        response = {
+            'public_key': wallet.public_key,
+            'private_key': wallet.private_key
+        }
+        global blockchain
+        blockchain = Blockchain(wallet.public_key)
+        return jsonify(response), 201
+    else:
+        response = {
+            'message': 'Saving keys failed'
+        }
+        return jsonify(response), 500
+
+
+def load_keys():
+    pass
+
 
 @app.route('/', methods=['GET']) # decorator to create route
 def get_ui():
@@ -17,18 +38,19 @@ def get_ui():
 
 @app.route('/mine', methods=['POST'])
 def mine():
-    block =  blockchain.mine_block()
+    block = blockchain.mine_block()
     if block != None:
-        dict_block = block.__dict__.copy() # return block to dictionary
-        dict_block['transactions'] = [tx.__dict__ for tx in dict_block['transactions']] # list comprehension
+        dict_block = block.__dict__.copy()
+        dict_block['transactions'] = [
+            tx.__dict__ for tx in dict_block['transactions']]
         response = {
-            'message': 'Block added',
+            'message': 'Block added successfully.',
             'block': dict_block
         }
         return jsonify(response), 201
     else:
         response = {
-            'message': 'Adding block failed',
+            'message': 'Adding a block failed.',
             'wallet_set_up': wallet.public_key != None
         }
         return jsonify(response), 500
@@ -44,4 +66,4 @@ def get_chain():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000) #localhost port 3000
+    app.run(host='0.0.0.0', port=5000) #localhost port 3000
