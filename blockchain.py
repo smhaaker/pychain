@@ -111,6 +111,8 @@ class Blockchain:
 
 
     def get_balance(self):
+        if self.hosting_node == None:
+            return None
         participant = self.hosting_node
         tx_sender = [[tx.amount for tx in block.transactions if tx.sender == participant] for block in self.__chain]
         # need to get open transactions sent using List Comprehension
