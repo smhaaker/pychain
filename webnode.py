@@ -15,6 +15,11 @@ def get_ui():
     return send_from_directory('ui', 'node.html')
 
 
+@app.route('/network', methods=['GET']) # decorator to create route
+def get_network_ui():
+    return send_from_directory('ui', 'network.html')
+
+
 @app.route('/wallet', methods=['POST'])
 def create_keys():
     wallet.create_keys()
@@ -147,6 +152,51 @@ def get_chain():
         dict_block['transactions'] = [tx.__dict__ for tx in dict_block['transactions']]
     return jsonify(dict_chain), 200
 
+
+@app.route('/add_node', methods=['POST'])
+def add_node():
+    values = request.get_json()
+    if not values:
+        response = {
+            'message': 'No data'
+        }
+        return jsonify(response), 400
+    if 'node' not in values:
+        response = {
+            'message': 'No node data found'
+        }
+        return jsonify(response), 400
+    node = values.get('node')
+    blockchain.add_peer_node(node)
+    response = {
+        'message': 'Node added success',
+        'all_nodes': list(blockchain.get_peer_nodes())
+    }
+    return jsonify(response), 200
+
+
+@app.route('/remove_node/<node_url>', methods=['DELETE'])
+def remove_node(node_url):
+    if node_url == '' or node_url == None:
+        response = {
+            'message': 'no such node found'
+        }
+        return jsonify(response), 400
+    blockchain.remove_peer_node(node_url)
+    response = {
+        'message': 'node removed',
+        'all_nodes': blockchain.get_peer_nodes()
+    }
+    return jsonify(response), 200
+
+
+@app.route('/nodes', methods=['GET'])
+def get_nodes():
+    nodes = blockchain.get_peer_nodes()
+    response = {
+        'all_nodes': nodes
+    }
+    return jsonify(response), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) #localhost port 3000
