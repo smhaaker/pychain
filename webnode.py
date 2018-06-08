@@ -109,39 +109,6 @@ def broadcast_transaction():
         return jsonify(response), 500
         
 
-# @app.route('/broadcast-block', methods=['POST'])
-# def broadcast_block():
-#     values = request.get_json()
-#     if not values:
-#         response = {
-#             'message': 'no data found'
-#         }
-#         return jsonify(response), 400
-#     if 'block' not in values:
-#         response = {
-#             'message': 'block missing'
-#         }
-#         return jsonify(response), 400
-#     block = values['block']
-#     if block['index'] == blockchain.chain[-1].index + 1:
-#         if blockchain.add_block(block):
-#             response = {
-#                 'message': 'block added'
-#             }
-#             return jsonify(response), 201
-#         else:
-#             response = {
-#                 'message': 'invalid block'
-#             }
-#             return jsonify(response), 500
-#     elif block['index'] > blockchain.chain[-1].index:
-#         pass
-#     else:
-#         response = {
-#             'message': 'blockchain too short'
-#         }
-#         return jsonify(response), 409
-
 @app.route('/broadcast-block', methods=['POST'])
 def broadcast_block():
     values = request.get_json()
@@ -158,9 +125,11 @@ def broadcast_block():
             return jsonify(response), 201
         else:
             response = {'message': 'Block seems invalid.'}
-            return jsonify(response), 500
+            blockchain.resolve_conflicts = True
+            return jsonify(response), 409
     elif block['index'] > blockchain.chain[-1].index:
-        pass
+        response = {'message': 'Blockchain differs from local blockchain'}
+        return jsonify(response), 200
     else: 
         response = {'message': 'Blockchain seems to be shorter, block not added'}
         return jsonify(response), 409
@@ -212,6 +181,11 @@ def add_transaction():
 
 @app.route('/mine', methods=['POST'])
 def mine():
+    if blockchain.resolve_conflicts == True: # if conflict you cannot mine block
+        response = {
+            'message': 'resolve conflicts, block not added'
+        }
+        return jsonify(response), 409
     block = blockchain.mine_block()
     if block != None:
         dict_block = block.__dict__.copy()
@@ -229,6 +203,16 @@ def mine():
             'wallet_set_up': wallet.public_key != None
         }
         return jsonify(response), 500
+
+
+@app.route('/resolve_conflicts', methods=['POST'])
+def resolve_conflicts():
+    replaced = blockchain.resolve()
+    if replaced: 
+        response = {'message': 'chain updated and or replaced'}
+    else:
+        response = {'message': 'local chain longest'}
+    return jsonify(response), 200
 
 
 @app.route('/transactions', methods=['GET'])
@@ -291,6 +275,7 @@ def get_nodes():
         'all_nodes': nodes
     }
     return jsonify(response), 200
+
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
