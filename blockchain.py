@@ -29,7 +29,7 @@ class Blockchain:
         self.__open_transactions = [] #private
         self.public_key = public_key
         self.__peer_nodes = set()
-        self.node_id = node_id # remove if not testinsg locally
+        self.node_id = node_id # remove if not testing locally
         self.resolve_conflicts = False
         self.load_data()
 
@@ -41,12 +41,6 @@ class Blockchain:
     @chain.setter
     def chain(self,val):
         self.__chain = val
-
-
-
-
-    # def get_chain(self):
-    #     return self.__chain[:]
 
 
     def get_open_transactions(self):
