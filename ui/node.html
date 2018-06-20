@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
         crossorigin="anonymous">
     <style>
+        pre{
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .alert{
+        }
         .lds-ring {
             display: inline-block;
             position: relative;
@@ -77,7 +83,7 @@
                 {{ error }}
             </div>
             <div v-if="success" class="alert alert-success" role="alert">
-                {{ success }}
+                <pre>{{ success }}</pre>
             </div>
             <div class="row">
                 <div class="col">
@@ -248,7 +254,7 @@
                         .then(function (response){
                             //console.log(response)
                             vm.error = null;
-                            vm.success = 'Created wallet Public Key: ' + response.data.public_key + ', Private Key: ' + response.data.private_key;
+                            vm.success = 'Created wallet \n\nPublic Key: \n\n' + response.data.public_key + '\n\nPrivate Key: \n\n' + response.data.private_key;
                             vm.wallet = {
                                 public_key: response.data.public_key,
                                 private_key: response.data.private_key
@@ -270,7 +276,7 @@
                         .then(function (response){
                                 //console.log(response)
                                 vm.error = null;
-                                vm.success = 'Created wallet Public Key: ' + response.data.public_key + ', Private Key: ' + response.data.private_key;
+                                vm.success = 'Created wallet \n\nPublic Key: \n\n' + response.data.public_key + '\n\nPrivate Key: \n\n' + response.data.private_key;
                                     vm.wallet = {
                                     public_key: response.data.public_key,
                                     private_key: response.data.private_key
