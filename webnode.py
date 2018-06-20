@@ -9,15 +9,15 @@ app = Flask(__name__)
 # must also fix constructor in wallet and blockchain py files
 # blockchain = Blockchain(wallet.public_key)
 
-CORS(app) #wrap app with CORS to allow access 
+CORS(app)  # wrap app with CORS to allow access
 
 
-@app.route('/', methods=['GET']) # decorator to create route
+@app.route('/', methods=['GET'])  # decorator to create route
 def get_ui():
     return send_from_directory('ui', 'node.html')
 
 
-@app.route('/network', methods=['GET']) # decorator to create route
+@app.route('/network', methods=['GET'])  # decorator to create route
 def get_network_ui():
     return send_from_directory('ui', 'network.html')
 
@@ -63,7 +63,7 @@ def load_keys():
 @app.route('/balance', methods=['GET'])
 def get_balance():
     balance = blockchain.get_balance()
-    if balance != None:
+    if balance is not None:
         response = {
             'message': 'Fetching Balance Successful',
             'funds': balance
@@ -72,9 +72,10 @@ def get_balance():
     else:
         response = {
             'message': 'Loading balance failed',
-            'wallet_set_up': wallet.public_key != None
+            'wallet_set_up': wallet.public_key is not None
         }
         return jsonify(response), 500
+
 
 @app.route('/broadcast-transaction', methods=['POST'])
 def broadcast_transaction():
@@ -90,7 +91,11 @@ def broadcast_transaction():
             'message': 'some data missing'
         }
         return jsonify(response), 400
-    success = blockchain.add_transaction(values['recipient'], values['sender'], values['signature'], values['amount'], is_receiving=True)
+    success = blockchain.add_transaction(
+        values['recipient'],
+        values['sender'],
+        values['signature'], 
+        values['amount'], is_receiving=True)
     if success:
         response = {
             'message': 'transaction added successfully',
@@ -102,12 +107,12 @@ def broadcast_transaction():
             }
         }
         return jsonify(response), 201
-    else: 
+    else:
         response = {
             'message': 'Broadcast transaction failed'
         }
         return jsonify(response), 500
-        
+
 
 @app.route('/broadcast-block', methods=['POST'])
 def broadcast_block():
@@ -130,15 +135,15 @@ def broadcast_block():
     elif block['index'] > blockchain.chain[-1].index:
         response = {'message': 'Blockchain differs from local blockchain'}
         return jsonify(response), 200
-    else: 
-        response = {'message': 'Blockchain seems to be shorter, block not added'}
+    else:
+        response = {
+            'message': 'Blockchain seems to be shorter, block not added'}
         return jsonify(response), 409
-
 
 
 @app.route('/transaction', methods=['POST'])
 def add_transaction():
-    if wallet.public_key == None:
+    if wallet.public_key is None:
         response = {
             'message': 'No wallet found'
         }
@@ -156,11 +161,12 @@ def add_transaction():
             'message': 'Missing required data'
         }
         return jsonify(response), 400
-    recipient = values['recipient'] # accessing recipient in dictionary 
+    recipient = values['recipient']  # accessing recipient in dictionary
     amount = values['amount']
     signature = wallet.sign_transaction(wallet.public_key, recipient, amount)
-    success = blockchain.add_transaction(recipient, wallet.public_key, signature, amount)
-    if success: # if success true
+    success = blockchain.add_transaction(
+        recipient, wallet.public_key, signature, amount)
+    if success:  # if success true
         response = {
             'message': 'transaction added successfully',
             'transaction': {
@@ -172,7 +178,7 @@ def add_transaction():
             'funds': blockchain.get_balance()
         }
         return jsonify(response), 201
-    else: 
+    else:
         response = {
             'message': 'creating transaction failed'
         }
@@ -181,13 +187,13 @@ def add_transaction():
 
 @app.route('/mine', methods=['POST'])
 def mine():
-    if blockchain.resolve_conflicts == True: # if conflict you cannot mine block
+    if blockchain.resolve_conflicts is True:  # if conflict you cannot mine
         response = {
             'message': 'resolve conflicts, block not added'
         }
         return jsonify(response), 409
     block = blockchain.mine_block()
-    if block != None:
+    if block is not None:
         dict_block = block.__dict__.copy()
         dict_block['transactions'] = [
             tx.__dict__ for tx in dict_block['transactions']]
@@ -200,7 +206,7 @@ def mine():
     else:
         response = {
             'message': 'Adding a block failed.',
-            'wallet_set_up': wallet.public_key != None
+            'wallet_set_up': wallet.public_key is not None
         }
         return jsonify(response), 500
 
@@ -208,7 +214,7 @@ def mine():
 @app.route('/resolve_conflicts', methods=['POST'])
 def resolve_conflicts():
     replaced = blockchain.resolve()
-    if replaced: 
+    if replaced:
         response = {'message': 'chain updated and or replaced'}
     else:
         response = {'message': 'local chain longest'}
@@ -225,9 +231,11 @@ def get_open_transactions():
 @app.route('/chain', methods=['GET'])
 def get_chain():
     chain_snapshot = blockchain.chain
-    dict_chain = [block.__dict__.copy() for block in chain_snapshot] # list comprehension that converts chain to dictionary per block
+    # list comprehension that converts chain to dictionary per block
+    dict_chain = [block.__dict__.copy() for block in chain_snapshot]
     for dict_block in dict_chain:
-        dict_block['transactions'] = [tx.__dict__ for tx in dict_block['transactions']]
+        dict_block['transactions'] = [
+            tx.__dict__ for tx in dict_block['transactions']]
     return jsonify(dict_chain), 200
 
 
@@ -255,7 +263,7 @@ def add_node():
 
 @app.route('/remove_node/<node_url>', methods=['DELETE'])
 def remove_node(node_url):
-    if node_url == '' or node_url == None:
+    if node_url == '' or node_url is None:
         response = {
             'message': 'no such node found'
         }

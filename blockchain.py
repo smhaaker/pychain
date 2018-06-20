@@ -305,7 +305,10 @@ class Blockchain:
         stored_transactions = self.__open_transactions[:]
         for itx in block['transactions']:
             for opentx in stored_transactions:
-                if opentx.sender == itx['sender'] and opentx.recipient == itx['recipient'] and opentx.amount == itx['amount'] and opentx.signature == itx['signature']:
+                if (opentx.sender == itx['sender'] and
+                        opentx.recipient == itx['recipient'] and
+                        opentx.amount == itx['amount'] and
+                        opentx.signature == itx['signature']):
                     try:
                         self.__open_transactions.remove(opentx)
                     except ValueError:
