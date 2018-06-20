@@ -94,7 +94,7 @@ def broadcast_transaction():
     success = blockchain.add_transaction(
         values['recipient'],
         values['sender'],
-        values['signature'], 
+        values['signature'],
         values['amount'], is_receiving=True)
     if success:
         response = {

@@ -212,8 +212,8 @@ class Blockchain:
                                                      'recipient': recipient,
                                                      'amount': amount,
                                                      'signature': signature})
-                        if (response.status_code == 400
-                                or response.status_code == 500):
+                        if (response.status_code == 400 or
+                                response.status_code == 500):
                             print('transaction failed, resolve please')
                             return False
                     except requests.exceptions.ConnectionError:
@@ -317,7 +317,7 @@ class Blockchain:
         return True
 
     def resolve(self):
-        """ Resolve conflicts 
+        """ Resolve conflicts
         Checks which node has which chain"""
         winner_chain = self.chain
         replace = False

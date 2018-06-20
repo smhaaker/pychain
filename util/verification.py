@@ -9,7 +9,7 @@ class Verification:
     def valid_proof(transactions, last_hash, proof):
         """ Checks if new hash is valid
 
-        Arguments: 
+        Arguments:
             :transactions:
             :last_hash:
             :proof: proof number / nonce
@@ -61,7 +61,7 @@ class Verification:
                     for tx in open_transactions])
 
         # the above is a list comprehension of whats below
-        # using all, checks if all transactions are true. 
+        # using all, checks if all transactions are true.
         # Any would check if at least one is true
         # is_valid = True
         # for tx in open_transactions:
