@@ -73,6 +73,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/network">Network</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" >Current block: {{ block }}</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -81,7 +84,7 @@
                 {{ error }}
             </div>
             <div v-if="success" class="alert alert-success" role="alert">
-                <pre>{{ success }}</pre>
+                <pre v-html="success">{{ success }}</pre>
             </div>
             <div class="row">
                 <div class="col">
@@ -212,6 +215,17 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
+        // function test() {
+        //     let variable = document.getElementById("wallet");
+        //     console.log(variable)
+        //     let text = variable.innerText;
+        //     console.log(text)
+        // }
+        function getPublicKey() {
+            let element = document.getElementById("publicKey");
+            let text = element.innerHTML;
+            console.log(text)
+        }
         new Vue({
             el: '#app',
             data: {
@@ -230,6 +244,7 @@
                 error: null,
                 success: null,
                 funds: 0,
+                block: 0,
                 outgoingTx: {
                     recipient: '',
                     amount: 0
@@ -252,7 +267,7 @@
                         .then(function (response){
                             //console.log(response)
                             vm.error = null;
-                            vm.success = 'Created wallet \n\nPublic Key: \n\n' + response.data.public_key + '\n\nPrivate Key: \n\n' + response.data.private_key;
+                            vm.success = 'Wallet Created \n\nPublic Key: \n\n' + response.data.public_key + '\n\nPrivate Key: \n\n' + response.data.private_key;
                             vm.wallet = {
                                 public_key: response.data.public_key,
                                 private_key: response.data.private_key
@@ -274,7 +289,7 @@
                         .then(function (response){
                                 //console.log(response)
                                 vm.error = null;
-                                vm.success = 'Created wallet \n\nPublic Key: \n\n' + response.data.public_key + '\n\nPrivate Key: \n\n' + response.data.private_key;
+                                vm.success = '<h3 onclick="test()" id="wallet">Wallet Loaded</h3> \nPublic Key: \n\n' + '<div onclick="getPublicKey()" id="publicKey">' + response.data.public_key + '</div>' + '\n\nPrivate Key: \n\n' + response.data.private_key;
                                     vm.wallet = {
                                     public_key: response.data.public_key,
                                     private_key: response.data.private_key
@@ -341,7 +356,8 @@
                         this.dataLoading = true
                         axios.get('/chain')
                             .then(function (response){
-                            //    console.log(response.data)
+                                console.log(response.data.length)
+                                vm.block = response.data.length // loads last block
                                 vm.blockchain = response.data
                                 vm.dataLoading = false
                             })

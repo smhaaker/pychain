@@ -1,11 +1,11 @@
-from uuid import uuid4  # improt unique id
+from uuid import uuid4  # import unique id
 
 from blockchain import Blockchain
 # from verification import Verification
 from util.verification import Verification
 from wallet import Wallet
 
-port = 5000
+port = 5000  # temporary fix for terminal version
 
 
 class Node:
