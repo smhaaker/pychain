@@ -326,11 +326,12 @@
                 },
                 onMine: function() {
                     var vm = this
+                    this.onLoadData(); // reloads all data when mining
                     axios.post('/mine')
                         .then(function(response){
                             vm.error = null;
                             vm.success = response.data.message;
-                            console.log(response.data);
+                            // console.log(response.data);
                             vm.funds = response.data.funds;
                         })
                         .catch(function (error){
@@ -356,8 +357,8 @@
                         this.dataLoading = true
                         axios.get('/chain')
                             .then(function (response){
-                                console.log(response.data.length)
-                                vm.block = response.data.length // loads last block
+                                console.log(response.data[response.data.length - 1 ].index) // last block index
+                                vm.block = response.data.length - 1// loads last block
                                 vm.blockchain = response.data
                                 vm.dataLoading = false
                             })

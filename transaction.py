@@ -1,10 +1,10 @@
 from collections import OrderedDict
-#from printable import Printable
 from util.printable import Printable
+
 
 class Transaction(Printable):
     """ Transaction to be added to blockchain block
-    
+
     Attributes:
         :sender: sender
         :recipient: recipient
@@ -19,4 +19,7 @@ class Transaction(Printable):
         self.signature = signature
 
     def to_ordered_dict(self):
-        return OrderedDict([('sender', self.sender),('recipient', self.recipient),('amount', self.amount)])
+        return OrderedDict([
+            ('sender', self.sender),
+            ('recipient', self.recipient),
+            ('amount', self.amount)])

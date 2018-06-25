@@ -20,7 +20,7 @@ class Verification:
         guess_hash = hash_string_256(guess)
         # print(guess_hash)
         # checking the leading zeros, if it is really a hash difficulty change
-        return guess_hash[0:2] == '00'
+        return guess_hash[0:2] == '00'  # changes diff
         # just add zeros to increase difficulty
 
     @classmethod
