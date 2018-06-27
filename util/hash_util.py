@@ -9,7 +9,7 @@ def hash_string_256(string):
 def hash_block(block):
     """ returns hash block
 
-    Arguments: 
+    Arguments:
         :block: The Block That Will Be Hashed
     """
     hashable_block = block.__dict__.copy()
