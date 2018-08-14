@@ -200,7 +200,7 @@ def mine():
         response = {
             'message': 'Block added successfully.',
             'block': dict_block,
-            'funds': blockchain.get_balance()
+            'funds': blockchain.get_balance(),
         }
         return jsonify(response), 201
     else:
