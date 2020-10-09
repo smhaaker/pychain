@@ -12,6 +12,14 @@ class Wallet:
         self.node_id = node_id  # remove when not testing locally
 
     def create_keys(self):
+        """Transaction to be added to blockchain block
+
+        Attributes:
+            :sender: sender
+            :recipient: recipient
+            :signature: transaction signature
+            :amount: value
+        """
         private_key, public_key = self.generate_keys()
         self.private_key = private_key
         self.public_key = public_key
@@ -63,9 +71,6 @@ class Wallet:
 
     @staticmethod
     def verify_transaction(transaction):
-        print(
-            "blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blahblah blah blah blah blah blah"
-        )
         public_key = RSA.importKey(binascii.unhexlify(transaction.sender))
         verifier = PKCS1_v1_5.new(public_key)
         h = SHA256.new(
