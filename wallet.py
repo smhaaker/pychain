@@ -12,13 +12,10 @@ class Wallet:
         self.node_id = node_id  # remove when not testing locally
 
     def create_keys(self):
-        """Transaction to be added to blockchain block
+        """Generates keys
 
-        Attributes:
-            :sender: sender
-            :recipient: recipient
-            :signature: transaction signature
-            :amount: value
+        :param: none
+        :return: 200
         """
         private_key, public_key = self.generate_keys()
         self.private_key = private_key
