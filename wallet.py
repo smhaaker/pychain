@@ -63,6 +63,7 @@ class Wallet:
 
     @staticmethod
     def verify_transaction(transaction):
+        """ Long comment goes here ... Long comment goes here ...  Long comment goes here ...  Long comment goes here ... """
         public_key = RSA.importKey(binascii.unhexlify(transaction.sender))
         verifier = PKCS1_v1_5.new(public_key)
         h = SHA256.new(
