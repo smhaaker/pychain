@@ -1,0 +1,1 @@
+sed -e 's/com.blah.user-thing/com.blah.user-bnr/'
